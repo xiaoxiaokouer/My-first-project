@@ -34,16 +34,25 @@ def mj_model():
     model = Sequential()
     model.add(Lambda(lambda x:x/255.-0.5, input_shape=input_shape))
     
-    model.add(Conv2D(24,5,5,padding='same', activation='relu'))
+    model.add(Conv2D(24,kernel_size=5,strides=(2,2),padding='same', activation='relu'))
+    
+    model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='same', data_format=None))
+    
+#    model.add(Conv2D(36,kernel_size=5,strides=(2,2),padding='same', activation='relu'))
+#    
 #    model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='same', data_format=None))
-    model.add(Conv2D(36,5,5,padding='same', activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='same', data_format=None))
-    model.add(Conv2D(48,5,5,padding='same', activation='relu'))
+    
+    model.add(Conv2D(48,kernel_size=5,strides=(2,2),padding='same', activation='relu'))
+    
 #    model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='same', data_format=None))
-    model.add(Conv2D(64,3,3,padding='same', activation='relu'))
+    
+    model.add(Conv2D(64,kernel_size=3,strides=(1,1),padding='same', activation='relu'))
+    
     model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='same', data_format=None))
-    model.add(Conv2D(64,3,3,padding='same', activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='same', data_format=None))
+    
+#    model.add(Conv2D(64,kernel_size=3,strides=(1,1),padding='same', activation='relu'))
+    
+#    model.add(MaxPooling2D(pool_size=(2, 2), strides=None, padding='same', data_format=None))
     
     model.add(Flatten())
     
