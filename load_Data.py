@@ -14,6 +14,9 @@ t_epoch_ids = [1,2,3,4,5,6,7,8]
 ## validation data
 v_epoch_ids = [9]
 
+## test data
+test_epoch_ids = [10]
+
 
 ##--------count all frames for training set and validation set-----------###
 n_frames_t = np.zeros((len(t_epoch_ids),),dtype=np.uint16)
@@ -35,6 +38,14 @@ for j in v_epoch_ids:
 sum_frames_v = n_frames_v.sum(axis=0)
 print ("total frames number----validation set:",sum_frames_v)
 
+n_frames_test = np.zeros((len(test_epoch_ids),),dtype=np.uint16)
+k = 0
+for j in test_epoch_ids:
+    video_path = utils.join_dir(epoch_dir, 'epoch{:0>2}_front.mkv'.format(j))
+    n_frames_test[k] = utils.ffmpeg_frame_count(video_path)
+    k += 1
+sum_frames_test = n_frames_test.sum(axis=0)
+print ("total frames number----test set:",sum_frames_test)
 
 #--------------------copy from run.py---------------#
 def img_pre_process(img):
@@ -75,6 +86,7 @@ np.save("X_train.npy", X_train)
 np.save("y_train.npy", y_train)
 print('----------complete! total number of training images are : {} ----------'.format(len(X_train)))
 
+
 X_val = np.zeros((sum_frames_v, params.FLAGS.img_h, params.FLAGS.img_w, 3), dtype=np.uint16)
 y_val = np.zeros((sum_frames_v, 1))
 k2 = 0
@@ -95,3 +107,28 @@ for epoch_id in v_epoch_ids:
 np.save("X_val.npy", X_val)
 np.save("y_val.npy", y_val)
 print('----------complete! total number of validation images are: {} ----------'.format(len(X_val)))
+
+
+X_test = np.zeros((sum_frames_test, params.FLAGS.img_h, params.FLAGS.img_w, 3), dtype=np.uint16)
+y_test = np.zeros((sum_frames_test, 1))
+k2 = 0
+for epoch_id in test_epoch_ids:
+    print('---------- loadding video for epoch {} ----------'.format(epoch_id))
+    video_path = utils.join_dir(params.data_dir, 'epoch{:0>2}_front.mkv'.format(epoch_id))
+    assert os.path.isfile(video_path) 
+    frames = utils.ffmpeg_frame_count(video_path)
+    labels = utils.get_human_steering(epoch_id)
+    for i in range(frames):        
+        cap = cv2.VideoCapture(video_path)
+        ret, img = cap.read()
+        img = img_pre_process(img)
+        X_test[k2] = img
+        y_test[k2] = labels[i]
+        k2 += 1 
+    cap.release()               
+np.save("X_test.npy", X_test)
+np.save("y_test.npy", y_test)
+print('----------complete! total number of validation images are: {} ----------'.format(len(X_test)))
+
+
+
